@@ -38,13 +38,13 @@ def SaveLine(index, line, lable):
 def getLineCenter(x1,y1,x2,y2):
     return abs((x1+x2))/2, abs((y1+y2))/2
 
-def CheckAvailableLine(line, line_dir):
+def CheckAvailableLine(x1,y1,x2,y2, line_dir):
     for l in line_dir.values():
-        if line.x1()==l['line'].x1() and line.y1()==l['line'].y1() \
-             and line.x2()==l['line'].x2() and line.y2()==l['line'].y2():
+        if x1==l['line'].x1() and y1==l['line'].y1() \
+             and x2==l['line'].x2() and y2==l['line'].y2():
             return True
-        elif line.x1()==l['line'].x2() and line.y1()==l['line'].y2() \
-             and line.x2()==l['line'].x1() and line.y2()==l['line'].y1():
+        elif x1==l['line'].x2() and y1==l['line'].y2() \
+             and x2==l['line'].x1() and y2==l['line'].y1():
             return True
     return False
 
@@ -60,3 +60,18 @@ def getLineCBox(l1, l2, line_dict):
             return x,y,i
     return None,None,None
 
+def DeleteCircle(x, y, circle_info, line_info):
+    cx, cy, index = getCircleCenter(x, y, circle_info)
+    try:
+        del circle_info[index]
+    except:
+        pass
+    l = []
+    for i,j in zip(line_info,line_info.values()):
+        if j['line'].x1()==int(cx) and j['line'].y1()==int(cy):
+            l.append(i)
+        elif j['line'].x2()==int(cx) and j['line'].y2()==int(cy):
+            l.append(i)
+    for i in l:
+        del line_info[i]
+    return circle_info, line_info

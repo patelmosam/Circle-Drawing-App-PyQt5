@@ -58,6 +58,7 @@ class App(QMainWindow):
         self.lcnt = 0
         self.im = False
         self.lastpoint = None
+        self.delete = False
         #self.line = QLineEdit(self)
         button2 = QPushButton('Generate Report', self)
         button2.setToolTip('This is an example button')
@@ -120,7 +121,7 @@ class App(QMainWindow):
             #qp1.setPen(pen)
             #qp1.setFont(QFont('Decorative', 10))
             self.clearImage()
-            for i in range(1,self.m+1):
+            for i in self.circles:
                 painter.drawEllipse(self.circles[i]['x'], self.circles[i]['y'], self.circles[i]['r'], self.circles[i]['r']) 
                 cp.drawEllipse(self.circles[i]['x'], self.circles[i]['y'], self.circles[i]['r'], self.circles[i]['r']) 
                 qp.drawText(self.circles[i]['x'], self.circles[i]['y'], self.circles[i]['lable'])
@@ -136,7 +137,7 @@ class App(QMainWindow):
             qp1 = QPainter(self.image)
             qp1.setPen(pen)
             qp1.setFont(QFont('Decorative', 10))
-            for i in range(1,self.m+1):
+            for i in self.circles:
                 qp1.drawText(self.circles[i]['x'], self.circles[i]['y'], self.circles[i]['lable'])
             qp1.end()
 
@@ -153,6 +154,10 @@ class App(QMainWindow):
                     #self.press=False
                     painter3.end()
 
+        if self.delete:
+            self.circles, self.lines = DeleteCircle(self.lastpoint2.x(),self.lastpoint2.y(), self.circles, self.lines)
+            self.delete = False
+            
         if self.press :
             if len(self.points)==2:
                 self.points = []
@@ -164,7 +169,7 @@ class App(QMainWindow):
             if len(self.points)==2 and self.points[0][0] != None and self.points[1][0] != None:
                 self.line = QLine(self.points[0][0],self.points[0][1],self.points[1][0],self.points[1][1])
                 #print(self.line)
-                if not CheckAvailableLine(self.line, self.lines):
+                if not CheckAvailableLine(self.line.x1(),self.line.y1(),self.line.x2(),self.line.y2(), self.lines):
                     if not CheckEmptyLine(self.line):
                         self.points = []
                         self.lines = SaveLine(len(self.lines)+1, self.line, 'line'+str(len(self.lines)+1))
@@ -208,6 +213,10 @@ class App(QMainWindow):
         if event.button() == Qt.LeftButton:
             self.lastpoint = event.pos()
             self.press = True
+            self.update()
+        if event.button() == Qt.RightButton:
+            self.lastpoint2 = event.pos()
+            self.delete = True
             self.update()
     '''        
     def mouseMoveEvent(self, event):
