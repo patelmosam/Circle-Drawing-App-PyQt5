@@ -142,8 +142,7 @@ class App(QMainWindow):
 
             if self.lastpoint != None:
                 Cx, Cy, _ = getCircleCenter(self.lastpoint.x(),self.lastpoint.y(),self.circles)
-            #if len(self.points)==2:
-             #   self.points = []
+            
                 if not Cx==None:
                     
                     painter3 = QPainter(self)
@@ -155,11 +154,11 @@ class App(QMainWindow):
                     painter3.end()
 
         if self.press :
+            if len(self.points)==2:
+                self.points = []
             self.points.append((Cx,Cy))
             self.press=False
-            print(len(self.points))
             if len(self.points)==2:
-                print(self.points)
                 self.line = QLine(self.points[0][0],self.points[0][1],self.points[1][0],self.points[1][1])
                 #print(self.line)
                 if not CheckAvailableLine(self.line, self.lines):
