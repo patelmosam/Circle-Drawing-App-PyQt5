@@ -156,9 +156,12 @@ class App(QMainWindow):
         if self.press :
             if len(self.points)==2:
                 self.points = []
-            self.points.append((Cx,Cy))
+            try:
+                self.points.append((Cx,Cy))
+            except: 
+                self.points = []
             self.press=False
-            if len(self.points)==2:
+            if len(self.points)==2 and self.points[0][0] != None and self.points[1][0] != None:
                 self.line = QLine(self.points[0][0],self.points[0][1],self.points[1][0],self.points[1][1])
                 #print(self.line)
                 if not CheckAvailableLine(self.line, self.lines):
