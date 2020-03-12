@@ -150,7 +150,7 @@ class App(QMainWindow):
                     painter3.end()
 
         if self.delete:
-            self.circles, self.lines = DeleteCircle(self.lastpoint2.x(),self.lastpoint2.y(), self.circles, self.lines)
+            self.circles, self.lines = DeleteCircle(self.lastpoint.x(),self.lastpoint.y(), self.circles, self.lines)
             self.delete = False
             
         if self.press :
@@ -210,9 +210,7 @@ class App(QMainWindow):
             self.press = True
             self.update()
         if event.button() == Qt.RightButton:
-            self.lastpoint2 = event.pos()
-            self.delete = True
-            self.update()
+            pass
     '''        
     def mouseMoveEvent(self, event):
         self.path.lineTo(event.pos())
@@ -235,6 +233,11 @@ class App(QMainWindow):
             elif not index==None:
                 self.getText(index, 'circle')
                 
+            self.update()
+
+    def keyPressEvent(self, event):
+        if event.key() == Qt.Key_Delete:
+            self.delete = True
             self.update()
 
     def getText(self,index,type):
