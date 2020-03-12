@@ -50,6 +50,7 @@ class App(QMainWindow):
         self.m = 0
         self.circles = {}
         self.points = []
+        self.line_list = {}
         self.press = False
         self.press1 = False
         self.text = ''
@@ -58,8 +59,9 @@ class App(QMainWindow):
         self.lines = {}
         self.lcnt = 0
         self.im = False
-        self.lastpoint = None
+        self.lastpoint, self.select_circle = None, None
         self.delete = False
+        self.move = False
         #self.line = QLineEdit(self)
         button2 = QPushButton('Generate Report', self)
         button2.setToolTip('This is an example button')
@@ -138,7 +140,7 @@ class App(QMainWindow):
 
             if self.lastpoint != None:
                 Cx, Cy, _ = getCircleCenter(self.lastpoint.x(),self.lastpoint.y(),self.circles)
-            
+                #print(Cx,Cy)
                 if not Cx==None:
                     
                     painter3 = QPainter(self)
@@ -203,6 +205,36 @@ class App(QMainWindow):
             painter0.drawImage(event.rect(), self.image, self.rect())
             #pass
 
+        if not self.select_circle is None:
+            r = self.circles[self.select_circle]['r']
+            self.circles[self.select_circle]['x'] = self.lastpoint2.x() 
+            self.circles[self.select_circle]['y'] = self.lastpoint2.y() 
+            P = QPoint(self.lastpoint2.x() + (r/2),self.lastpoint2.y() + (r/2))
+            for l in self.line_list:
+                if self.line_list[l] == 0:
+
+                    self.lines[l]['line'].setP1(P)
+                    #self.line_list[l]['line'].y1 = self.lastpoint2.y()
+                elif self.line_list[l] == 1:
+                    self.lines[l]['line'].setP2(P)
+                    #self.line_list[l]['line'].y2 = self.lastpoint2.y()
+            self.select_circle = None
+            self.line_list = {}
+
+        if self.move  and self.select_circle == None:
+            x_,y_,self.select_circle = getCircleCenter(self.lastpoint.x(),self.lastpoint.y(),self.circles)
+            
+            if x_ is not None:
+                for i,j in zip(line_info,line_info.values()):
+                    if j['line'].x1()==int(x_) and j['line'].y1()==int(y_):
+                        self.line_list[i] = 0
+                    elif j['line'].x2()==int(x_) and j['line'].y2()==int(y_):
+                        self.line_list[i] = 1
+            self.move = False
+        
+
+
+
 
     def mousePressEvent(self, event):
         if event.button() == Qt.LeftButton:
@@ -210,7 +242,9 @@ class App(QMainWindow):
             self.press = True
             self.update()
         if event.button() == Qt.RightButton:
-            pass
+            self.lastpoint2 = event.pos()
+            self.move = True
+            self.update()
     '''        
     def mouseMoveEvent(self, event):
         self.path.lineTo(event.pos())
