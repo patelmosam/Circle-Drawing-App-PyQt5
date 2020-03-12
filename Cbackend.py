@@ -75,3 +75,11 @@ def DeleteCircle(x, y, circle_info, line_info):
     for i in l:
         del line_info[i]
     return circle_info, line_info
+
+def GenerateReport(circle_info, line_info):
+    report = {}
+    for j in line_info.values():
+        x1,y1,index1 = getCircleCenter(j['line'].x1(),j['line'].y1(),circle_info)
+        x2,y2,index2 = getCircleCenter(j['line'].x2(),j['line'].y2(),circle_info)
+        report[j['lable']] = [circle_info[index1]['lable'],circle_info[index2]['lable']]
+    return report

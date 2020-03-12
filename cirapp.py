@@ -5,6 +5,7 @@ from PyQt5.QtCore import pyqtSlot
 from PyQt5.QtCore import Qt, QPoint, QLine
 from Cbackend import *
 import numpy as np
+import json
 
 class App(QMainWindow):
 
@@ -63,23 +64,17 @@ class App(QMainWindow):
         button2 = QPushButton('Generate Report', self)
         button2.setToolTip('This is an example button')
         button2.move(10,250)
-        button2.clicked.connect(self.p)  
+        button2.clicked.connect(self.report)  
         
         self.show()
 
-    def p(self):
-        print(self.circles)
     @pyqtSlot()
-    def on_click(self):
-        print('button click')
+    def report(self):
+        report = GenerateReport(self.circles, self.lines)
+        #print(report)
+        with open('report.json','w') as file:
+            json.dump(report,file)
 
-    @pyqtSlot()
-    def on_click1(self):
-        print('button1 click')
-
-    @pyqtSlot()
-    def on_click2(self):
-        print('button2 click')
 
     def draw_circle(self):
         button = self.sender()
