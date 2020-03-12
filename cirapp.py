@@ -245,17 +245,7 @@ class App(QMainWindow):
             self.lastpoint2 = event.pos()
             self.move = True
             self.update()
-    '''        
-    def mouseMoveEvent(self, event):
-        self.path.lineTo(event.pos())
-        p = QPainter(self.image)
-        p.setPen(QPen(self.myPenColor,
-                      self.myPenWidth, Qt.SolidLine, Qt.RoundCap,
-                      Qt.RoundJoin))
-        p.drawPath(self.path)
-        p.end()
-        self.update()'''
-
+  
     def mouseDoubleClickEvent(self, event):
         if event.button() == Qt.LeftButton:
             self.lastpoint1 = event.pos()
