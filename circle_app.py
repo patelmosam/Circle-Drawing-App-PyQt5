@@ -30,17 +30,6 @@ class App(QMainWindow):
 
         self.label = QLabel(self)
         self.label.resize(80,20)
-
-
-        button = QPushButton('Add', self)
-        button.setToolTip('This is an example button')
-        button.move(10,150)
-        button.clicked.connect(self.draw_circle)
-        
-        button1 = QPushButton('Save', self)
-        button1.setToolTip('This is an example button')
-        button1.move(10,200)
-        button1.clicked.connect(lambda : self.saveImage('image.png', 'PNG'))     
         self.circle = False
         self.m = 0
         self.circles = {}
@@ -53,6 +42,17 @@ class App(QMainWindow):
         self.lines = {}
         self.lcnt = 0
         self.im = False
+
+        button = QPushButton('Add', self)
+        button.setToolTip('This is an example button')
+        button.move(10,150)
+        button.clicked.connect(self.draw_circle)
+        
+        button1 = QPushButton('Save', self)
+        button1.setToolTip('This is an example button')
+        button1.move(10,200)
+        button1.clicked.connect(lambda : self.saveImage('image.png', 'PNG'))     
+
         #self.line = QLineEdit(self)
         button2 = QPushButton('Generate Report', self)
         button2.setToolTip('This is an example button')
@@ -61,19 +61,6 @@ class App(QMainWindow):
         
         self.show()
 
-    def p(self):
-        print(self.circles)
-    @pyqtSlot()
-    def on_click(self):
-        print('button click')
-
-    @pyqtSlot()
-    def on_click1(self):
-        print('button1 click')
-
-    @pyqtSlot()
-    def on_click2(self):
-        print('button2 click')
 
     def draw_circle(self):
         button = self.sender()
