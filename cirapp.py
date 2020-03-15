@@ -35,17 +35,6 @@ class App(QMainWindow):
 
         self.label = QLabel(self)
         self.label.resize(80,20)
-
-
-        button = QPushButton('Add', self)
-        button.setToolTip('This is an example button')
-        button.move(10,150)
-        button.clicked.connect(self.draw_circle)
-        
-        button1 = QPushButton('Save', self)
-        button1.setToolTip('This is an example button')
-        button1.move(10,200)
-        button1.clicked.connect(lambda : self.saveImage('image.png', 'PNG'))     
         self.circle = False
         self.m = 0
         self.circles = {}
@@ -62,7 +51,17 @@ class App(QMainWindow):
         self.lastpoint, self.select_circle = None, None
         self.delete = False
         self.move = False
-        #self.line = QLineEdit(self)
+
+        button = QPushButton('Add', self)
+        button.setToolTip('This is an example button')
+        button.move(10,150)
+        button.clicked.connect(self.draw_circle)
+        
+        button1 = QPushButton('Save', self)
+        button1.setToolTip('This is an example button')
+        button1.move(10,200)
+        button1.clicked.connect(lambda : self.saveImage('image.png', 'PNG'))     
+
         button2 = QPushButton('Generate Report', self)
         button2.setToolTip('This is an example button')
         button2.move(10,250)
@@ -73,7 +72,6 @@ class App(QMainWindow):
     @pyqtSlot()
     def report(self):
         report = GenerateReport(self.circles, self.lines)
-        #print(report)
         with open('report.json','w') as file:
             json.dump(report,file)
 
@@ -84,12 +82,11 @@ class App(QMainWindow):
         self.x, self.y, self.r, self.cname = getRandomCircle(self.m)
         self.circles = SaveCircle(self.m,self.x,self.y,self.r,self.cname)
         self.circle = True
-        #self.clearImage()
         self.update()
 
     def clearImage(self):
         self.path = QPainterPath()
-        self.image.fill(Qt.white)  ## switch it to else
+        self.image.fill(Qt.white)  
         self.update()
 
     def saveImage(self, fileName, fileFormat):
@@ -98,38 +95,28 @@ class App(QMainWindow):
 
     def paintEvent(self,event):
         QMainWindow.paintEvent(self, event)
-        #print(2)
-        
-        #painter0 = QPainter(self)
-        #painter0.drawImage(event.rect(), self.image, self.rect())
+ 
         if self.circle:
-            #print(3)
             painter = QPainter(self.image)
-            #qp1 = QPainter(self)
             cp = QPainter(self)
             pen = QPen(Qt.red, 3)
             painter.setPen(pen)
             cp.setPen(pen)
             qp = QPainter(self)
             
-            #
+            
             qp.setPen(pen)
             qp.setFont(QFont('Decorative', 10))
-            #qp1.setPen(pen)
-            #qp1.setFont(QFont('Decorative', 10))
             self.clearImage()
             for i in self.circles:
                 painter.drawEllipse(self.circles[i]['x'], self.circles[i]['y'], self.circles[i]['r'], self.circles[i]['r']) 
                 cp.drawEllipse(self.circles[i]['x'], self.circles[i]['y'], self.circles[i]['r'], self.circles[i]['r']) 
                 qp.drawText(self.circles[i]['x'], self.circles[i]['y'], self.circles[i]['lable'])
-               # qp1.drawText(self.circles[i]['x'], self.circles[i]['y'], self.circles[i]['lable'])
             
             painter.end()
             qp.end()
             cp.end()
-            #self.circle = False
-            #qp1.end()
-       
+
         if self.circle:
             qp1 = QPainter(self.image)
             qp1.setPen(pen)
@@ -140,15 +127,13 @@ class App(QMainWindow):
 
             if self.lastpoint != None:
                 Cx, Cy, _ = getCircleCenter(self.lastpoint.x(),self.lastpoint.y(),self.circles)
-                #print(Cx,Cy)
+              
                 if not Cx==None:
                     
                     painter3 = QPainter(self)
                     pen = QPen(Qt.black,5)
                     painter3.setPen(pen)
                     painter3.drawPoint(Cx,Cy)
-                    #self.points.append((Cx,Cy))
-                    #self.press=False
                     painter3.end()
 
         if self.delete:
@@ -165,13 +150,13 @@ class App(QMainWindow):
             self.press=False
             if len(self.points)==2 and self.points[0][0] != None and self.points[1][0] != None:
                 self.line = QLine(self.points[0][0],self.points[0][1],self.points[1][0],self.points[1][1])
-                #print(self.line)
+                
                 if not CheckAvailableLine(self.line.x1(),self.line.y1(),self.line.x2(),self.line.y2(), self.lines):
                     if not CheckEmptyLine(self.line):
                         self.points = []
                         self.lines = SaveLine(len(self.lines)+1, self.line, 'line'+str(len(self.lines)+1))
                     
-        #if self.circle:
+        
         painter1 = QPainter(self)
         Lpainter = QPainter(self)
         Tp1 = QPainter(self.image)
@@ -203,7 +188,7 @@ class App(QMainWindow):
         if self.im:
             painter0 = QPainter(self)
             painter0.drawImage(event.rect(), self.image, self.rect())
-            #pass
+            
 
         if not self.select_circle is None:
             r = self.circles[self.select_circle]['r']
@@ -214,10 +199,8 @@ class App(QMainWindow):
                 if self.line_list[l] == 0:
 
                     self.lines[l]['line'].setP1(P)
-                    #self.line_list[l]['line'].y1 = self.lastpoint2.y()
                 elif self.line_list[l] == 1:
                     self.lines[l]['line'].setP2(P)
-                    #self.line_list[l]['line'].y2 = self.lastpoint2.y()
             self.select_circle = None
             self.line_list = {}
 
@@ -267,7 +250,6 @@ class App(QMainWindow):
     def getText(self,index,type):
         text, okPressed = QInputDialog.getText(self, "Enter Lable",'change '+ type + " lable:", QLineEdit.Normal, "")
         if okPressed and text != '':
-            #self.text1 = text
             if type == "circle":
                 self.circles[index]['lable'] = text
             elif  type == 'line':
