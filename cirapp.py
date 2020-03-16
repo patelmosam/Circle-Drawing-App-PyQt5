@@ -17,6 +17,19 @@ class App(QMainWindow):
         self.width = 1200
         self.height = 1000
 
+        self.cnt = 0
+        self.circle_dict = {}
+        self.points = []
+        self.line_list = {}
+        self.press = False
+        self.text = ''
+        self.index = 0
+        self.line_dict = {}
+        self.im = False
+        self.lastpoint, self.select_circle = None, None
+        self.delete = False
+        self.move = False
+
         self.myPenWidth = 13
         self.myPenColor = Qt.black
         self.image = QImage(self.width, self.height, QImage.Format_RGB32)
@@ -36,18 +49,7 @@ class App(QMainWindow):
         self.label = QLabel(self)
         self.label.resize(80,20)
         self.circle = False
-        self.cnt = 0
-        self.circle_dict = {}
-        self.points = []
-        self.line_list = {}
-        self.press = False
-        self.text = ''
-        self.index = 0
-        self.line_dict = {}
-        self.im = False
-        self.lastpoint, self.select_circle = None, None
-        self.delete = False
-        self.move = False
+
 
         button = QPushButton('Add', self)
         button.setToolTip('Add a new random circle')
@@ -94,42 +96,42 @@ class App(QMainWindow):
         QMainWindow.paintEvent(self, event)
  
         if self.circle:
-            painter = QPainter(self.image)
-            cp = QPainter(self)
+            Cpainter = QPainter(self.image)
+            Cpainter_img = QPainter(self)
             pen = QPen(Qt.red, 3)
-            painter.setPen(pen)
-            cp.setPen(pen)
-            qp = QPainter(self)
-            qp.setPen(pen)
-            qp.setFont(QFont('Decorative', 10))
+            Cpainter.setPen(pen)
+            Cpainter_img.setPen(pen)
+            Tpainter1 = QPainter(self)
+            Tpainter1.setPen(pen)
+            Tpainter1.setFont(QFont('Decorative', 10))
             self.clearImage()
             for i in self.circle_dict:
-                painter.drawEllipse(self.circle_dict[i]['x'], self.circle_dict[i]['y'], self.circle_dict[i]['r'], self.circle_dict[i]['r']) 
-                cp.drawEllipse(self.circle_dict[i]['x'], self.circle_dict[i]['y'], self.circle_dict[i]['r'], self.circle_dict[i]['r']) 
-                qp.drawText(self.circle_dict[i]['x'], self.circle_dict[i]['y'], self.circle_dict[i]['lable'])
+                Cpainter.drawEllipse(self.circle_dict[i]['x'], self.circle_dict[i]['y'], self.circle_dict[i]['r'], self.circle_dict[i]['r']) 
+                Cpainter_img.drawEllipse(self.circle_dict[i]['x'], self.circle_dict[i]['y'], self.circle_dict[i]['r'], self.circle_dict[i]['r']) 
+                Tpainter1.drawText(self.circle_dict[i]['x'], self.circle_dict[i]['y'], self.circle_dict[i]['lable'])
             
-            painter.end()
-            qp.end()
-            cp.end()
+            Cpainter.end()
+            Tpainter1.end()
+            Cpainter_img.end()
 
         if self.circle:
-            qp1 = QPainter(self.image)
-            qp1.setPen(pen)
-            qp1.setFont(QFont('Decorative', 10))
+            Tpainter1_img = QPainter(self.image)
+            Tpainter1_img.setPen(pen)
+            Tpainter1_img.setFont(QFont('Decorative', 10))
             for i in self.circle_dict:
-                qp1.drawText(self.circle_dict[i]['x'], self.circle_dict[i]['y'], self.circle_dict[i]['lable'])
-            qp1.end()
+                Tpainter1_img.drawText(self.circle_dict[i]['x'], self.circle_dict[i]['y'], self.circle_dict[i]['lable'])
+            Tpainter1_img.end()
 
             if self.lastpoint != None:
                 Cx, Cy, _ = getCircleCenter(self.lastpoint.x(),self.lastpoint.y(),self.circle_dict)
               
                 if not Cx==None:
                     
-                    painter3 = QPainter(self)
+                    Ppainter = QPainter(self)
                     pen = QPen(Qt.black,5)
-                    painter3.setPen(pen)
-                    painter3.drawPoint(Cx,Cy)
-                    painter3.end()
+                    Ppainter.setPen(pen)
+                    Ppainter.drawPoint(Cx,Cy)
+                    Ppainter.end()
 
         if self.delete:
             self.circle_dict, self.line_dict = DeleteCircle(self.lastpoint.x(),self.lastpoint.y(), self.circle_dict, self.line_dict)
@@ -152,37 +154,37 @@ class App(QMainWindow):
                         self.line_dict = SaveLine(len(self.line_dict)+1, self.line, 'line'+str(len(self.line_dict)+1))
                     
         
-        painter1 = QPainter(self)
         Lpainter = QPainter(self)
-        Tp1 = QPainter(self.image)
+        Tpainter2 = QPainter(self)
+        Tpainter2_img = QPainter(self.image)
         pen = QPen(Qt.black, 3)
-        painter1.setPen(pen)
-        Tp1.setPen(pen)
         Lpainter.setPen(pen)
-        Lpainter.setFont(QFont('Decorative', 10))
-        Tp1.setFont(QFont('Decorative', 10))
+        Tpainter2_img.setPen(pen)
+        Tpainter2.setPen(pen)
+        Tpainter2.setFont(QFont('Decorative', 10))
+        Tpainter2_img.setFont(QFont('Decorative', 10))
         for l in self.line_dict.values():
             x,y = getLineCenter(l['line'].x1(),l['line'].y1(),l['line'].x2(),l['line'].y2())
             if not l['line'].isNull():
-                painter1.drawLine(l['line'])
-                Lpainter.drawText(x, y, l['lable'])
-                Tp1.drawText(x, y, l['lable'])
-        painter1.end()
+                Lpainter.drawLine(l['line'])
+                Tpainter2.drawText(x, y, l['lable'])
+                Tpainter2_img.drawText(x, y, l['lable'])
         Lpainter.end()
-        Tp1.end()
+        Tpainter2.end()
+        Tpainter2_img.end()
         
-        Tp = QPainter(self.image)
+        Lpainter_img = QPainter(self.image)
         pen = QPen(Qt.black, 3)
-        Tp.setPen(pen)
+        Lpainter_img.setPen(pen)
         for l in self.line_dict.values():
             x,y = getLineCenter(l['line'].x1(),l['line'].y1(),l['line'].x2(),l['line'].y2())
             if not l['line'].isNull():
-                Tp.drawLine(l['line'])
-        Tp.end()
+                Lpainter_img.drawLine(l['line'])
+        Lpainter_img.end()
 
         if self.im:
-            painter0 = QPainter(self)
-            painter0.drawImage(event.rect(), self.image, self.rect())
+            Ipainter = QPainter(self)
+            Ipainter.drawImage(event.rect(), self.image, self.rect())
             
 
         if not self.select_circle is None:
