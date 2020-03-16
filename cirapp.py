@@ -36,8 +36,8 @@ class App(QMainWindow):
         self.label = QLabel(self)
         self.label.resize(80,20)
         self.circle = False
-        self.m = 0
-        self.circles = {}
+        self.cnt = 0
+        self.circle_dict = {}
         self.points = []
         self.line_list = {}
         self.press = False
@@ -68,16 +68,16 @@ class App(QMainWindow):
 
     @pyqtSlot()
     def report(self):
-        report = GenerateReport(self.circles, self.lines)
+        report = GenerateReport(self.circle_dict, self.lines)
         with open('report.json','w') as file:
             json.dump(report,file)
 
 
     def draw_circle(self):
         button = self.sender()
-        self.m+=1
-        self.x, self.y, self.r, self.cname = getRandomCircle(self.m)
-        self.circles = SaveCircle(self.m,self.x,self.y,self.r,self.cname)
+        self.cnt+=1
+        self.x, self.y, self.r, self.circle_lable = getRandomCircle(self.cnt)
+        self.circle_dict = SaveCircle(self.cnt,self.x,self.y,self.r,self.circle_lable)
         self.circle = True
         self.update()
 
@@ -103,10 +103,10 @@ class App(QMainWindow):
             qp.setPen(pen)
             qp.setFont(QFont('Decorative', 10))
             self.clearImage()
-            for i in self.circles:
-                painter.drawEllipse(self.circles[i]['x'], self.circles[i]['y'], self.circles[i]['r'], self.circles[i]['r']) 
-                cp.drawEllipse(self.circles[i]['x'], self.circles[i]['y'], self.circles[i]['r'], self.circles[i]['r']) 
-                qp.drawText(self.circles[i]['x'], self.circles[i]['y'], self.circles[i]['lable'])
+            for i in self.circle_dict:
+                painter.drawEllipse(self.circle_dict[i]['x'], self.circle_dict[i]['y'], self.circle_dict[i]['r'], self.circle_dict[i]['r']) 
+                cp.drawEllipse(self.circle_dict[i]['x'], self.circle_dict[i]['y'], self.circle_dict[i]['r'], self.circle_dict[i]['r']) 
+                qp.drawText(self.circle_dict[i]['x'], self.circle_dict[i]['y'], self.circle_dict[i]['lable'])
             
             painter.end()
             qp.end()
@@ -116,12 +116,12 @@ class App(QMainWindow):
             qp1 = QPainter(self.image)
             qp1.setPen(pen)
             qp1.setFont(QFont('Decorative', 10))
-            for i in self.circles:
-                qp1.drawText(self.circles[i]['x'], self.circles[i]['y'], self.circles[i]['lable'])
+            for i in self.circle_dict:
+                qp1.drawText(self.circle_dict[i]['x'], self.circle_dict[i]['y'], self.circle_dict[i]['lable'])
             qp1.end()
 
             if self.lastpoint != None:
-                Cx, Cy, _ = getCircleCenter(self.lastpoint.x(),self.lastpoint.y(),self.circles)
+                Cx, Cy, _ = getCircleCenter(self.lastpoint.x(),self.lastpoint.y(),self.circle_dict)
               
                 if not Cx==None:
                     
@@ -132,7 +132,7 @@ class App(QMainWindow):
                     painter3.end()
 
         if self.delete:
-            self.circles, self.lines = DeleteCircle(self.lastpoint.x(),self.lastpoint.y(), self.circles, self.lines)
+            self.circle_dict, self.lines = DeleteCircle(self.lastpoint.x(),self.lastpoint.y(), self.circle_dict, self.lines)
             self.delete = False
             
         if self.press :
@@ -186,9 +186,9 @@ class App(QMainWindow):
             
 
         if not self.select_circle is None:
-            r = self.circles[self.select_circle]['r']
-            self.circles[self.select_circle]['x'] = self.lastpoint2.x() 
-            self.circles[self.select_circle]['y'] = self.lastpoint2.y() 
+            r = self.circle_dict[self.select_circle]['r']
+            self.circle_dict[self.select_circle]['x'] = self.lastpoint2.x() 
+            self.circle_dict[self.select_circle]['y'] = self.lastpoint2.y() 
             P = QPoint(self.lastpoint2.x() + (r/2),self.lastpoint2.y() + (r/2))
             for l in self.line_list:
                 if self.line_list[l] == 0:
@@ -200,7 +200,7 @@ class App(QMainWindow):
             self.line_list = {}
 
         if self.move  and self.select_circle == None:
-            x_,y_,self.select_circle = getCircleCenter(self.lastpoint.x(),self.lastpoint.y(),self.circles)
+            x_,y_,self.select_circle = getCircleCenter(self.lastpoint.x(),self.lastpoint.y(),self.circle_dict)
             
             if x_ is not None:
                 for i,j in zip(line_info,line_info.values()):
@@ -223,7 +223,7 @@ class App(QMainWindow):
     def mouseDoubleClickEvent(self, event):
         if event.button() == Qt.LeftButton:
             self.lastpoint1 = event.pos()
-            Cx, Cy, index = getCircleCenter(self.lastpoint1.x(),self.lastpoint1.y(),self.circles)
+            Cx, Cy, index = getCircleCenter(self.lastpoint1.x(),self.lastpoint1.y(),self.circle_dict)
             lx, ly, lindex = getLineCBox(self.lastpoint1.x(),self.lastpoint1.y(),self.lines)
             
             if not lindex==None:
@@ -242,7 +242,7 @@ class App(QMainWindow):
         text, okPressed = QInputDialog.getText(self, "Enter Lable",'change '+ type + " lable:", QLineEdit.Normal, "")
         if okPressed and text != '':
             if type == "circle":
-                self.circles[index]['lable'] = text
+                self.circle_dict[index]['lable'] = text
             elif  type == 'line':
                 self.lines[index]['lable'] = text
 
