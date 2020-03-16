@@ -50,17 +50,19 @@ class App(QMainWindow):
         self.label.resize(80,20)
         self.circle = False
 
-
+        # add button for adding random circle
         button = QPushButton('Add', self)
         button.setToolTip('Add a new random circle')
         button.move(10,150)
         button.clicked.connect(self.draw_circle)
         
+        # save button to save circle image
         button1 = QPushButton('Save', self)
         button1.setToolTip('Save image of canvas')
         button1.move(10,200)
         button1.clicked.connect(lambda : self.saveImage('image.png', 'PNG'))     
 
+        # generate report button
         button2 = QPushButton('Generate Report', self)
         button2.setToolTip('Generate a report')
         button2.move(10,250)
@@ -68,13 +70,14 @@ class App(QMainWindow):
         
         self.show()
 
+    # method for generate report, activates on generate report button press
     @pyqtSlot()
     def report(self):
         report = GenerateReport(self.circle_dict, self.line_dict)
         with open('report.json','w') as file:
             json.dump(report,file)
 
-
+    # method for drawing circle, activates on add button press
     def draw_circle(self):
         button = self.sender()
         self.cnt+=1
@@ -88,13 +91,16 @@ class App(QMainWindow):
         self.image.fill(Qt.white)  
         self.update()
 
+    # method for save circle image, activates on save button press
     def saveImage(self, fileName, fileFormat):
         self.im = True
         self.image.save(fileName, fileFormat)
 
+    # paint event method
     def paintEvent(self,event):
         QMainWindow.paintEvent(self, event)
- 
+
+        # draw circle & wirte lable on canvas paint event
         if self.circle:
             Cpainter = QPainter(self.image)
             Cpainter_img = QPainter(self)
@@ -115,6 +121,8 @@ class App(QMainWindow):
             Cpainter_img.end()
 
         if self.circle:
+
+            # draw circle on image paint event
             Tpainter1_img = QPainter(self.image)
             Tpainter1_img.setPen(pen)
             Tpainter1_img.setFont(QFont('Decorative', 10))
@@ -122,21 +130,23 @@ class App(QMainWindow):
                 Tpainter1_img.drawText(self.circle_dict[i]['x'], self.circle_dict[i]['y'], self.circle_dict[i]['lable'])
             Tpainter1_img.end()
 
+            # draw point paint event for selecting circle
             if self.lastpoint != None:
                 Cx, Cy, _ = getCircleCenter(self.lastpoint.x(),self.lastpoint.y(),self.circle_dict)
               
                 if not Cx==None:
-                    
                     Ppainter = QPainter(self)
                     pen = QPen(Qt.black,5)
                     Ppainter.setPen(pen)
                     Ppainter.drawPoint(Cx,Cy)
                     Ppainter.end()
 
+        # erase circle paint event 
         if self.delete:
             self.circle_dict, self.line_dict = DeleteCircle(self.lastpoint.x(),self.lastpoint.y(), self.circle_dict, self.line_dict)
             self.delete = False
             
+        
         if self.press :
             if len(self.points)==2:
                 self.points = []
@@ -153,7 +163,7 @@ class App(QMainWindow):
                         self.points = []
                         self.line_dict = SaveLine(len(self.line_dict)+1, self.line, 'line'+str(len(self.line_dict)+1))
                     
-        
+        # draw line and lable on canvas event 
         Lpainter = QPainter(self)
         Tpainter2 = QPainter(self)
         Tpainter2_img = QPainter(self.image)
@@ -173,6 +183,7 @@ class App(QMainWindow):
         Tpainter2.end()
         Tpainter2_img.end()
         
+        # draw line on image event 
         Lpainter_img = QPainter(self.image)
         pen = QPen(Qt.black, 3)
         Lpainter_img.setPen(pen)
@@ -182,11 +193,12 @@ class App(QMainWindow):
                 Lpainter_img.drawLine(l['line'])
         Lpainter_img.end()
 
+        # draw image event
         if self.im:
             Ipainter = QPainter(self)
             Ipainter.drawImage(event.rect(), self.image, self.rect())
             
-
+        # circle move action
         if not self.select_circle is None:
             r = self.circle_dict[self.select_circle]['r']
             self.circle_dict[self.select_circle]['x'] = self.lastpoint2.x() 
@@ -212,7 +224,12 @@ class App(QMainWindow):
                         self.line_list[i] = 1
             self.move = False
 
+    # mouse press event method
     def mousePressEvent(self, event):
+        '''
+        left mouse button: for select circle
+        right mouse button: for move circle
+        '''
         if event.button() == Qt.LeftButton:
             self.lastpoint = event.pos()
             self.press = True
@@ -222,7 +239,11 @@ class App(QMainWindow):
             self.move = True
             self.update()
   
+    # mouse double click event
     def mouseDoubleClickEvent(self, event):
+        '''
+        mouse double click: for change the lable of circle and line
+        '''
         if event.button() == Qt.LeftButton:
             self.lastpoint1 = event.pos()
             Cx, Cy, index = getCircleCenter(self.lastpoint1.x(),self.lastpoint1.y(),self.circle_dict)
@@ -235,11 +256,14 @@ class App(QMainWindow):
                 
             self.update()
 
+    # delete key press event method
     def keyPressEvent(self, event):
+        ''' delete key: for deleting circle '''
         if event.key() == Qt.Key_Delete:
             self.delete = True
             self.update()
 
+    # helper method for changing lable 
     def getText(self,index,type):
         text, okPressed = QInputDialog.getText(self, "Enter Lable",'change '+ type + " lable:", QLineEdit.Normal, "")
         if okPressed and text != '':

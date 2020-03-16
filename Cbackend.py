@@ -3,6 +3,7 @@ import  numpy as np
 circle_info = {}
 line_info = {}
 
+# generates rendom circle
 def getRandomCircle(index):
     max_X = 800
     max_Y = 800
@@ -10,7 +11,7 @@ def getRandomCircle(index):
     x = np.random.randint(100,max_X)
     y = np.random.randint(100,max_Y)
     r = np.random.randint(100,200)
-    #print(x,y)
+    
     if x+r>max_X:
         x = x-r
     if y+r>max_Y:
@@ -18,10 +19,12 @@ def getRandomCircle(index):
     label = label + str(index)
     return x,y,r,label
 
+# save circle to circle_dict
 def SaveCircle(n,x,y,r,lable):
     circle_info[n] = {'x':x,'y':y,'r':r,'lable':lable}
     return circle_info
 
+# get center of circle
 def getCircleCenter(x,y, circle_dict):
     cx, cy, index = None, None, None
     for i,j in zip(circle_dict.values(),circle_dict.keys()):
@@ -31,13 +34,16 @@ def getCircleCenter(x,y, circle_dict):
             index = j
     return cx,cy,index
 
+# save line to line_dict
 def SaveLine(index, line, lable):
     line_info[index] = {'line':line, 'lable':lable}
     return line_info
 
+# get line center
 def getLineCenter(x1,y1,x2,y2):
     return abs((x1+x2))/2, abs((y1+y2))/2
 
+# check availble line on line_dict
 def CheckAvailableLine(x1,y1,x2,y2, line_dir):
     for l in line_dir.values():
         if x1==l['line'].x1() and y1==l['line'].y1() \
@@ -48,11 +54,13 @@ def CheckAvailableLine(x1,y1,x2,y2, line_dir):
             return True
     return False
 
+# check if line is empty
 def CheckEmptyLine(line):
     if line.x1() == line.x2() and line.y1()==line.y2():
         return True
     return False
 
+# get lines that are in circle region
 def getLineCBox(l1, l2, line_dict):
     for l,i in zip(line_dict.values(),line_dict.keys()):
         x,y = getLineCenter(l['line'].x1(),l['line'].y1(),l['line'].x2(),l['line'].y2())
@@ -60,6 +68,7 @@ def getLineCBox(l1, l2, line_dict):
             return x,y,i
     return None,None,None
 
+# delete circle info form circle_dict
 def DeleteCircle(x, y, circle_info, line_info):
     cx, cy, index = getCircleCenter(x, y, circle_info)
     try:
@@ -76,6 +85,7 @@ def DeleteCircle(x, y, circle_info, line_info):
         del line_info[i]
     return circle_info, line_info
 
+# generate report from circle_dict and line_dict
 def GenerateReport(circle_info, line_info):
     report = {}
     for j in line_info.values():
