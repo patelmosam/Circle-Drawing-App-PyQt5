@@ -11,7 +11,7 @@ class App(QMainWindow):
 
     def __init__(self):
         super().__init__()
-        self.title = 'PyQt5 button - pythonspot.com'
+        self.title = 'circle drawing app'
         self.left = 700
         self.top = 700
         self.width = 1200
@@ -41,29 +41,26 @@ class App(QMainWindow):
         self.points = []
         self.line_list = {}
         self.press = False
-        self.press1 = False
         self.text = ''
-        self.text1 = ''
         self.index = 0
         self.lines = {}
-        self.lcnt = 0
         self.im = False
         self.lastpoint, self.select_circle = None, None
         self.delete = False
         self.move = False
 
         button = QPushButton('Add', self)
-        button.setToolTip('This is an example button')
+        button.setToolTip('Add a new random circle')
         button.move(10,150)
         button.clicked.connect(self.draw_circle)
         
         button1 = QPushButton('Save', self)
-        button1.setToolTip('This is an example button')
+        button1.setToolTip('Save image of canvas')
         button1.move(10,200)
         button1.clicked.connect(lambda : self.saveImage('image.png', 'PNG'))     
 
         button2 = QPushButton('Generate Report', self)
-        button2.setToolTip('This is an example button')
+        button2.setToolTip('Generate a report')
         button2.move(10,250)
         button2.clicked.connect(self.report)  
         
@@ -103,8 +100,6 @@ class App(QMainWindow):
             painter.setPen(pen)
             cp.setPen(pen)
             qp = QPainter(self)
-            
-            
             qp.setPen(pen)
             qp.setFont(QFont('Decorative', 10))
             self.clearImage()
@@ -214,10 +209,6 @@ class App(QMainWindow):
                     elif j['line'].x2()==int(x_) and j['line'].y2()==int(y_):
                         self.line_list[i] = 1
             self.move = False
-        
-
-
-
 
     def mousePressEvent(self, event):
         if event.button() == Qt.LeftButton:
