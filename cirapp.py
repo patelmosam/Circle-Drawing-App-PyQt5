@@ -43,7 +43,7 @@ class App(QMainWindow):
         self.press = False
         self.text = ''
         self.index = 0
-        self.lines = {}
+        self.line_dict = {}
         self.im = False
         self.lastpoint, self.select_circle = None, None
         self.delete = False
@@ -68,7 +68,7 @@ class App(QMainWindow):
 
     @pyqtSlot()
     def report(self):
-        report = GenerateReport(self.circle_dict, self.lines)
+        report = GenerateReport(self.circle_dict, self.line_dict)
         with open('report.json','w') as file:
             json.dump(report,file)
 
@@ -132,7 +132,7 @@ class App(QMainWindow):
                     painter3.end()
 
         if self.delete:
-            self.circle_dict, self.lines = DeleteCircle(self.lastpoint.x(),self.lastpoint.y(), self.circle_dict, self.lines)
+            self.circle_dict, self.line_dict = DeleteCircle(self.lastpoint.x(),self.lastpoint.y(), self.circle_dict, self.line_dict)
             self.delete = False
             
         if self.press :
@@ -146,10 +146,10 @@ class App(QMainWindow):
             if len(self.points)==2 and self.points[0][0] != None and self.points[1][0] != None:
                 self.line = QLine(self.points[0][0],self.points[0][1],self.points[1][0],self.points[1][1])
                 
-                if not CheckAvailableLine(self.line.x1(),self.line.y1(),self.line.x2(),self.line.y2(), self.lines):
+                if not CheckAvailableLine(self.line.x1(),self.line.y1(),self.line.x2(),self.line.y2(), self.line_dict):
                     if not CheckEmptyLine(self.line):
                         self.points = []
-                        self.lines = SaveLine(len(self.lines)+1, self.line, 'line'+str(len(self.lines)+1))
+                        self.line_dict = SaveLine(len(self.line_dict)+1, self.line, 'line'+str(len(self.line_dict)+1))
                     
         
         painter1 = QPainter(self)
@@ -161,7 +161,7 @@ class App(QMainWindow):
         Lpainter.setPen(pen)
         Lpainter.setFont(QFont('Decorative', 10))
         Tp1.setFont(QFont('Decorative', 10))
-        for l in self.lines.values():
+        for l in self.line_dict.values():
             x,y = getLineCenter(l['line'].x1(),l['line'].y1(),l['line'].x2(),l['line'].y2())
             if not l['line'].isNull():
                 painter1.drawLine(l['line'])
@@ -174,7 +174,7 @@ class App(QMainWindow):
         Tp = QPainter(self.image)
         pen = QPen(Qt.black, 3)
         Tp.setPen(pen)
-        for l in self.lines.values():
+        for l in self.line_dict.values():
             x,y = getLineCenter(l['line'].x1(),l['line'].y1(),l['line'].x2(),l['line'].y2())
             if not l['line'].isNull():
                 Tp.drawLine(l['line'])
@@ -193,9 +193,9 @@ class App(QMainWindow):
             for l in self.line_list:
                 if self.line_list[l] == 0:
 
-                    self.lines[l]['line'].setP1(P)
+                    self.line_dict[l]['line'].setP1(P)
                 elif self.line_list[l] == 1:
-                    self.lines[l]['line'].setP2(P)
+                    self.line_dict[l]['line'].setP2(P)
             self.select_circle = None
             self.line_list = {}
 
@@ -224,7 +224,7 @@ class App(QMainWindow):
         if event.button() == Qt.LeftButton:
             self.lastpoint1 = event.pos()
             Cx, Cy, index = getCircleCenter(self.lastpoint1.x(),self.lastpoint1.y(),self.circle_dict)
-            lx, ly, lindex = getLineCBox(self.lastpoint1.x(),self.lastpoint1.y(),self.lines)
+            lx, ly, lindex = getLineCBox(self.lastpoint1.x(),self.lastpoint1.y(),self.line_dict)
             
             if not lindex==None:
                 self.getText(lindex, 'line')
@@ -244,7 +244,7 @@ class App(QMainWindow):
             if type == "circle":
                 self.circle_dict[index]['lable'] = text
             elif  type == 'line':
-                self.lines[index]['lable'] = text
+                self.line_dict[index]['lable'] = text
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
