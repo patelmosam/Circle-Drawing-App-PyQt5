@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import QMainWindow, QApplication, QWidget, QPushButton,QInp
 from PyQt5.QtGui import QIcon, QImage, QPainter, QPen, QBrush, QColor, QFont, QPainterPath
 from PyQt5.QtCore import pyqtSlot
 from PyQt5.QtCore import Qt, QPoint, QLine
-from Cbackend import *
+from backend import *
 import numpy as np
 import json
 
